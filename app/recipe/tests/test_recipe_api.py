@@ -2,7 +2,6 @@
 Tests for recipe api.
 '''
 from decimal import Decimal
-from email.policy import default
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -58,7 +57,7 @@ class PrivateRecipeAPITests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user(email='user@example.com', password='testpass123')
+        self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
 
     def test_retrieve_recipes(self):
@@ -142,11 +141,11 @@ class PrivateRecipeAPITests(TestCase):
         )
 
         payload = {
-            'title': 'Sample Recipe Title',
+            'title': 'New Recipe Title',
+            'link': 'http://example.com/new-recipe.pdf',
+            'description': 'New Sample description',
             'time_minutes': 10,
             'price': Decimal('2.50'),
-            'description': 'Sample description',
-            'link': 'http://example.com/new-recipe.pdf',
         }
         url = detail_url(recipe.id)
         res = self.client.put(url, payload)
@@ -182,7 +181,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Recipe.objects.filter(id=recipe.id).exists())
 
-    def test_delete_other_user_recipe_error(self):
+    def test_recipe_other_users_recipe_error(self):
         new_user = create_user(email='user2@example.com', password='test123')
         recipe = create_recipe(user=new_user)
 
